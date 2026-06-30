@@ -31,9 +31,9 @@ jobs:
           tags: ghcr.io/${{ github.repository_owner }}/demoapi:latest
 
       - name: Install oc CLI
-        uses: redhat-actions/oc-installer@v1
+        uses: redhat-actions/openshift-tools-installer@v1
         with:
-          oc_version: "4.15"
+          oc: "4.15"
 
       - name: Log in to OpenShift
         uses: redhat-actions/oc-login@v1
