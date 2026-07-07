@@ -47,8 +47,19 @@ jobs:
 
       - name: Create or update app
         run: |
-          oc set image deployment/demoapi demoapi=ghcr.io/${{ github.repository_owner }}/demoapi:latest 2>/dev/null || \
-          oc new-app --image=ghcr.io/${{ github.repository_owner }}/demoapi:latest --name=demoapi
+          if oc get deployment demoapi &> /dev/null; then
+            echo "Deployment exists, updating image..."
+            oc set image deployment/demoapi demoapi=ghcr.io/${{ github.repository_owner }}/demoapi:latest
+          else
+            echo "Deployment does not exist, creating app..."
+            oc new-app --image=ghcr.io/${{ github.repository_owner }}/demoapi:latest --name=demoapi
+          fi
 
       - name: Expose service
-        run: oc expose service/demoapi 2>/dev/null || true
+        run: |
+          if oc get route demoapi &> /dev/null; then
+            echo "Route already exists, skipping creation."
+          else
+            echo "Creating edge route..."
+            oc create route edge demoapi --service=demoapi --port=8080-tcp
+          fi
